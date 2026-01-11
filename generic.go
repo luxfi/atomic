@@ -26,11 +26,25 @@ import (
 )
 
 // Atomic is a generic thread-safe wrapper for any type.
-// It uses a read-write mutex for safe concurrent access.
+//
+// For primitive types (bool, int32, int64, uint32, uint64), prefer using
+// the stdlib sync/atomic types directly (atomic.Bool, atomic.Int64, etc.)
+// as they are more efficient and use hardware atomics.
+//
+// Use Atomic[T] for:
+//   - Complex types (structs, slices, maps, interfaces)
+//   - Types that need JSON serialization
+//   - When you need a generic container
+//
+// Example:
+//
+//	var config Atomic[Config]
+//	config.Store(Config{Name: "default"})
+//	c := config.Load()
 type Atomic[T any] struct {
 	_ nocmp // disallow non-atomic comparison
 
-	lock  sync.RWMutex
+	mu    sync.RWMutex
 	value T
 }
 
@@ -39,49 +53,51 @@ func NewAtomic[T any](value T) *Atomic[T] {
 	return &Atomic[T]{value: value}
 }
 
-// Get atomically returns the current value.
-func (a *Atomic[T]) Get() T {
-	a.lock.RLock()
-	defer a.lock.RUnlock()
+// Load atomically returns the current value.
+// This is the preferred method name (matches sync/atomic).
+func (a *Atomic[T]) Load() T {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
 	return a.value
 }
 
-// Set atomically sets the value.
-func (a *Atomic[T]) Set(value T) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+// Store atomically sets the value.
+// This is the preferred method name (matches sync/atomic).
+func (a *Atomic[T]) Store(value T) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	a.value = value
 }
 
 // Swap atomically sets the value and returns the old value.
 func (a *Atomic[T]) Swap(value T) T {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	old := a.value
 	a.value = value
 	return old
 }
 
-// Load is an alias for Get for compatibility with sync/atomic naming.
-func (a *Atomic[T]) Load() T {
-	return a.Get()
+// Get is an alias for Load for backward compatibility.
+func (a *Atomic[T]) Get() T {
+	return a.Load()
 }
 
-// Store is an alias for Set for compatibility with sync/atomic naming.
-func (a *Atomic[T]) Store(value T) {
-	a.Set(value)
+// Set is an alias for Store for backward compatibility.
+func (a *Atomic[T]) Set(value T) {
+	a.Store(value)
 }
 
 // MarshalJSON implements json.Marshaler.
 func (a *Atomic[T]) MarshalJSON() ([]byte, error) {
-	a.lock.RLock()
-	defer a.lock.RUnlock()
+	a.mu.RLock()
+	defer a.mu.RUnlock()
 	return json.Marshal(a.value)
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (a *Atomic[T]) UnmarshalJSON(b []byte) error {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	return json.Unmarshal(b, &a.value)
 }

@@ -1,6 +1,6 @@
 module github.com/luxfi/atomic/tools
 
-go 1.26
+go 1.26.3
 
 require honnef.co/go/tools v0.5.1
 

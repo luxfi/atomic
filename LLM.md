@@ -1,4 +1,4 @@
-# LLM.md - Hanzo Atomic
+# Hanzo Atomic
 
 ## Overview
 Go module: github.com/luxfi/atomic

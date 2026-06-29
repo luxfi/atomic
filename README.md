@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/hero.svg" alt="atomic" width="880"></p>
+
 # atomic [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Go Report Card][reportcard-img]][reportcard]
 
 Simple wrappers for primitive types to enforce atomic access.

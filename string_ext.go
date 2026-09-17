@@ -22,11 +22,11 @@ package atomic
 
 //go:generate bin/gen-atomicwrapper -name=String -type=string -wrapped Value -pack packString -unpack unpackString -compareandswap -swap -file=string.go
 
-func packString(s string) interface{} {
+func packString(s string) any {
 	return s
 }
 
-func unpackString(v interface{}) string {
+func unpackString(v any) string {
 	if s, ok := v.(string); ok {
 		return s
 	}

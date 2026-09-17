@@ -59,6 +59,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 	"text/template"
@@ -79,7 +80,7 @@ func (sl *stringList) String() string {
 }
 
 func (sl *stringList) Set(s string) error {
-	for _, i := range strings.Split(s, ",") {
+	for i := range strings.SplitSeq(s, ",") {
 		*sl = append(*sl, strings.TrimSpace(i))
 	}
 	return nil
@@ -165,13 +166,7 @@ func run(args []string) error {
 
 	// Import encoding/json if needed.
 	if opts.JSON {
-		found := false
-		for _, imp := range opts.Imports {
-			if imp == "encoding/json" {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(opts.Imports, "encoding/json")
 
 		if !found {
 			opts.Imports = append(opts.Imports, "encoding/json")

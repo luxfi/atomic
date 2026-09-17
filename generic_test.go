@@ -57,7 +57,7 @@ func TestAtomicGenericConcurrent(t *testing.T) {
 	a := NewAtomic(0)
 	var wg sync.WaitGroup
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		wg.Add(1)
 		go func(v int) {
 			defer wg.Done()

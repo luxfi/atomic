@@ -27,11 +27,11 @@ package atomic
 
 type packedError struct{ Value error }
 
-func packError(v error) interface{} {
+func packError(v error) any {
 	return packedError{v}
 }
 
-func unpackError(v interface{}) error {
+func unpackError(v any) error {
 	if err, ok := v.(packedError); ok {
 		return err.Value
 	}

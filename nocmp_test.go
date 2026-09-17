@@ -35,7 +35,7 @@ import (
 func TestNocmpComparability(t *testing.T) {
 	tests := []struct {
 		desc       string
-		give       interface{}
+		give       any
 		comparable bool
 	}{
 		{
@@ -78,14 +78,14 @@ func TestNocmpComparability(t *testing.T) {
 func TestNocmpSize(t *testing.T) {
 	type x struct{ _ int }
 
-	before := reflect.TypeOf(x{}).Size()
+	before := reflect.TypeFor[x]().Size()
 
 	type y struct {
 		_ nocmp
 		_ x
 	}
 
-	after := reflect.TypeOf(y{}).Size()
+	after := reflect.TypeFor[y]().Size()
 
 	assert.Equal(t, before, after,
 		"expected nocmp to have no effect on struct size")
